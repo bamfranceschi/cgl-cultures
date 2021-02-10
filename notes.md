@@ -5,6 +5,7 @@ Given as a coding challenge for a job application process.
 ## Inputs
 
 - Two dimensional array of cells, determined either livable (L) or unlivable (.)
+- Format is in text file, needs to be imported and read
 
 ## Outputs
 
@@ -34,7 +35,7 @@ Once nested for loops are created, for each cell I need to check:
 - is the cell currently occupied?
 
   - if no, look at all adjacent cells and tally how many are occupied.
-    - if under 4, populate (A CHANGE HAPPENED, flip boolean to true)
+    - if under 4, populate (A CHANGE HAPPENED, flip boolean)
     - else it stays empty and move on to next cell
   - if yes, look at all adjacent cells and tally how many are occupied.
     - if under 4, cell stays alive
