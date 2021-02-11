@@ -1,21 +1,25 @@
 const fs = require("fs");
 const functions = require("./petriDish");
 
-const text = fs.readFileSync("./cell-cultures.txt", "utf8");
-const textByLine = text.split("\n");
+const readableFile = (filePath) => {
+  const text = fs.readFileSync(filePath, "utf8");
+  return (textByLine = text.split("\n"));
+};
 
-const sample = fs.readFileSync("./sample-cultures.txt", "utf8");
-const sampleByLine = sample.split("\n");
+//uncomment out lines 11-13 to run the sample cultures file
 
-//petri dish has now been cultured; every livable space is now inhabited. Count starts here at 1, representing first hour
-let petriDish = functions.getCultured(textByLine);
-let sampleDish = functions.getCultured(sampleByLine);
+// const sample = readableFile("./sample-cultures.txt");
+// let sampleDish = functions.stringArrayToDish(sample);
+// let stabilized = functions.stabilizeSample(sampleDish);
 
-let stabilized = functions.stabilizeSample(petriDish);
+const cultureSample = readableFile("./cell-cultures.txt");
+const petriDish = functions.stringArrayToDish(cultureSample);
 
-let analysis = functions.dishAnalysis(stabilized.dish);
+const stabilized = functions.stabilizeSample(petriDish);
 
-let finalStats = {
+const analysis = functions.dishAnalysis(stabilized.dish);
+
+const finalStats = {
   cycleCount: stabilized.cycleCount,
   cultureCount: analysis.cultureCount,
   cultureRatio: analysis.cultureRatio,

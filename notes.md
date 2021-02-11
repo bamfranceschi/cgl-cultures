@@ -5,7 +5,7 @@ Given as a coding challenge for a job application process.
 ## Inputs
 
 - Two dimensional array of cells, determined either livable (L) or unlivable (.)
-- Format is in text file, needs to be imported and read
+- Format is in text file, needs to be imported and read and turned into multi-d array.
 
 ## Outputs
 
@@ -23,19 +23,19 @@ Given as a coding challenge for a job application process.
 
 Thinking I'll use a while loop to check a boolean value (which will be changed only once no changes take place in cells, thus closing while loop)
 
-Or, a simple if statement could suffice?
-
 For performance optimization, nested for loops will perform best given research and data set size.
 
 I need a counter to count the number of iterations that happen
 
-Once nested for loops are created, for each cell I need to check:
+I need to make a copy of the initial dish state, so I am changing the next state, not current state.
 
-- is the cell livable? if no, skip to next cell. if yes, next question.
-- is the cell currently occupied?
+Once nested for loops are created, for each cell I need to check:
+(only care about livable cells)
+
+- is the livable cell currently occupied?
 
   - if no, look at all adjacent cells and tally how many are occupied.
-    - if under 4, populate (A CHANGE HAPPENED, flip boolean)
+    - if zero, populate (A CHANGE HAPPENED, flip boolean)
     - else it stays empty and move on to next cell
   - if yes, look at all adjacent cells and tally how many are occupied.
     - if under 4, cell stays alive
@@ -44,6 +44,7 @@ Once nested for loops are created, for each cell I need to check:
 After all cells checked, increment counter. Has a change occurred? (what's the value of bool?)
 
 - if yes, rinse and repeat.
+- reassign state
 - if no, return counter and proceed to final analysis
 
 Run another nested for loop to determine:

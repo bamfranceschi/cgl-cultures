@@ -1,26 +1,5 @@
-//txt file becomes a two-dimensional array
-const getCultured = (stringInput) => {
-  const twoDArray = [];
-
-  for (t = 0; t < stringInput.length; t++) {
-    let oneDArray = [];
-    for (let char of stringInput[t]) {
-      if (char === "L") {
-        char = "#";
-        oneDArray.push(char);
-      } else {
-        oneDArray.push(char);
-      }
-    }
-    twoDArray.push(oneDArray);
-  }
-
-  //leftover empty array at end, needs to be removed
-  twoDArray.pop();
-
-  return twoDArray;
-};
-
+const culture = "#";
+const livable = "L";
 const neighborCells = [
   [-1, -1],
   [0, -1],
@@ -32,74 +11,85 @@ const neighborCells = [
   [-1, 0],
 ];
 
+//array of strings becomes a two-dimensional array
+const stringArrayToDish = (stringArray) => {
+  const dish = stringArray
+    .map((line) => line.split(""))
+    .filter((arr) => arr.length !== 0);
+
+  return dish;
+};
+
+//function takes in neighbor cell coordinates and checks whether neighbor cells have a culture
+const countNeighbors = (dish, row, column, neighborCells) => {
+  let neighbors = 0;
+
+  neighborCells.forEach(([x, y]) => {
+    let neighborRow = row + y;
+    let neighborCol = column + x;
+
+    //stay in bounds of dish
+    if (
+      neighborRow >= 0 &&
+      neighborRow < dish.length &&
+      neighborCol >= 0 &&
+      neighborCol < dish[row].length
+    ) {
+      //count populated neighbors
+      if (dish[neighborRow][neighborCol] === culture) {
+        neighbors += 1;
+      }
+    }
+  });
+
+  return neighbors;
+};
+
 const stabilizeSample = (dish) => {
+  //first seeding of cultures, counts as 1st cycle. Thus, cycle count starts at 1
+  dish = dish.map((row) =>
+    row.map((cell) => (cell === livable ? culture : cell))
+  );
+
   let cycleCount = 1;
   let changes = true;
 
+  //while loop breaks once the sample stabilizes, i.e no changes have occurred in any cells
   while (changes) {
+    //need deep copy of dish, so we change next state, not current.
+    let dishCopy = JSON.parse(JSON.stringify(dish));
+
     changes = false;
-    //run simulation
-    for (row = 0; row < dish.length; row++) {
-      for (column = 0; column < dish[row].length; column++) {
-        //populated counter
-        if (dish[row][column] === "#") {
-          let populated = 0;
-          //need to check how many neighbor cells are populated
-          neighborCells.forEach(([x, y]) => {
-            let newRow = row + y;
-            let newCol = column + x;
 
-            //stay in bounds of 2darray
-            if (
-              newRow >= 0 &&
-              newRow < dish.length &&
-              newCol >= 0 &&
-              newCol < dish[row].length
-            ) {
-              //count populated neighbors
-              if (dish[newRow][newCol] === "#") {
-                populated += 1;
-              }
-            }
-          });
+    for (let row = 0; row < dish.length; row++) {
+      for (let column = 0; column < dish[row].length; column++) {
+        if (dish[row][column] === culture) {
+          //count populated cells around cell
+          let neighborCount = countNeighbors(dish, row, column, neighborCells);
 
-          if (populated >= 4) {
-            dish[row][column] = "L";
-            //CHANGE HAPPENED
+          //culture dies due to overcrowding
+          if (neighborCount >= 4) {
+            dishCopy[row][column] = livable;
             changes = true;
           }
         }
-        if (dish[row][column] === "L") {
-          let populated = 0;
+        if (dish[row][column] === livable) {
+          //count populated cells around cell
 
-          neighborCells.forEach(([x, y]) => {
-            let newRow = row + y;
-            let newCol = column + x;
+          let neighborCount = countNeighbors(dish, row, column, neighborCells);
 
-            //stay in bounds of 2darray
-            if (
-              newRow >= 0 &&
-              newRow < dish.length &&
-              newCol >= 0 &&
-              newCol < dish[row].length
-            ) {
-              //count populated neighbors
-              if (dish[newRow][newCol] === "#") {
-                populated += 1;
-              }
-            }
-          });
-
-          if (populated === 0) {
-            dish[row][column] = "#";
-            //CHANGE HAPPENED
+          //cell grows culture
+          if (neighborCount === 0) {
+            dishCopy[row][column] = culture;
             changes = true;
           }
         }
       }
     }
 
-    //increment count
+    //reassign dish so we correctly update the next state
+    dish = dishCopy;
+
     cycleCount += 1;
   }
   return { dish: dish, cycleCount: cycleCount };
@@ -109,12 +99,12 @@ const dishAnalysis = (dish) => {
   let cultureCount = 0;
   let livableCount = 0;
 
-  for (row = 0; row < dish.length; row++) {
-    for (column = 0; column < dish[row].length; column++) {
-      if (dish[row][column] === "#") {
+  for (let row = 0; row < dish.length; row++) {
+    for (let column = 0; column < dish[row].length; column++) {
+      if (dish[row][column] === culture) {
         cultureCount += 1;
       }
-      if (dish[row][column] === "L") {
+      if (dish[row][column] === livable) {
         livableCount += 1;
       }
     }
@@ -126,7 +116,7 @@ const dishAnalysis = (dish) => {
 };
 
 module.exports = {
-  getCultured,
+  stringArrayToDish,
   stabilizeSample,
   dishAnalysis,
 };
